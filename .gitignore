@@ -1,0 +1,11 @@
+# Ignore data files
+NMIS_Data/
+callers.xlsx
+calls.xlsx
+
+# Ignore secrets
+.streamlit/
+secrets.toml
+
+# Python cache
+__pycache__/

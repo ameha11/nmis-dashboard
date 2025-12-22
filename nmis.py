@@ -28,53 +28,45 @@ view_option = st.sidebar.radio(
 )
 
 # ==================================================
-# FILE LOADING
+# FILE LOADING 
 # ==================================================
-def load_default_file(path, name):
-    if os.path.exists(path):
-        df = pd.read_excel(path)
-        df.columns = df.columns.astype(str).str.strip().str.replace("\n", "", regex=False)
-        return df
-    else:
-        st.error(f"{name} file not found at {path}")
-        st.stop()
 
-calls_path = r"C:\Users\aberja\OneDrive - Research Triangle Institute\Documents\NMIS\NMIS_Data\calls.xlsx"
-caller_path = r"C:\Users\aberja\OneDrive - Research Triangle Institute\Documents\NMIS\NMIS_Data\callers.xlsx"
+DATA_DIR = "NMIS_Data"
+CALLS_FILE = os.path.join(DATA_DIR, "calls.xlsx")
+CALLERS_FILE = os.path.join(DATA_DIR, "callers.xlsx")
 
-calls_df = None
-caller_df = None
+os.makedirs(DATA_DIR, exist_ok=True)
 
+# Admin upload
 if st.session_state["role"] == "admin":
-    uploaded_calls = st.file_uploader(
-        "📁 Upload Calls Excel", type=["xlsx", "xls", "csv"], key="calls_upload"
-    )
-    uploaded_callers = st.file_uploader(
-        "📁 Upload Callers Excel", type=["xlsx", "xls", "csv"], key="callers_upload"
-    )
+    uploaded_calls = st.file_uploader("📁 Upload Calls Excel", type=["xlsx"])
+    uploaded_callers = st.file_uploader("📁 Upload Callers Excel", type=["xlsx"])
 
-    # Use uploaded files if provided, else default
     if uploaded_calls:
-        calls_df = pd.read_excel(uploaded_calls)
-    else:
-        calls_df = load_default_file(calls_path, "Calls")
+        with open(CALLS_FILE, "wb") as f:
+            f.write(uploaded_calls.getbuffer())
+        st.success("✅ Calls file saved")
 
     if uploaded_callers:
-        caller_df = pd.read_excel(uploaded_callers)
-    else:
-        caller_df = load_default_file(caller_path, "Callers")
+        with open(CALLERS_FILE, "wb") as f:
+            f.write(uploaded_callers.getbuffer())
+        st.success("✅ Callers file saved")
 
-else:  # viewer
-    # Viewer cannot upload, just load default files
-    calls_df = load_default_file(calls_path, "Calls")
-    caller_df = load_default_file(caller_path, "Callers")
 
+
+# Load saved files
+if not os.path.exists(CALLS_FILE) or not os.path.exists(CALLERS_FILE):
+    st.warning("⚠️ Admin must upload Calls and Callers files once.")
+    st.stop()
+
+calls_df = pd.read_excel(CALLS_FILE)
+caller_df = pd.read_excel(CALLERS_FILE)
 
 
 # ==================================================
 # DASHBOARD TITLE
 # ==================================================
-st.title("📊 NMIS Livestock Call Monitoring Dashboard")
+st.title("📊 NMIS Livestock Call Dashboard")
 
 # ==================================================
 # DATA PREPARATION (SHARED)

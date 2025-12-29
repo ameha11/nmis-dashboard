@@ -45,12 +45,12 @@ if st.session_state["role"] == "admin":
     if uploaded_calls:
         with open(CALLS_FILE, "wb") as f:
             f.write(uploaded_calls.getbuffer())
-        st.success("✅ Calls file saved")
+        
 
     if uploaded_callers:
         with open(CALLERS_FILE, "wb") as f:
             f.write(uploaded_callers.getbuffer())
-        st.success("✅ Callers file saved")
+        
 
 
 

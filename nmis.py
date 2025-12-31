@@ -24,7 +24,7 @@ st.sidebar.markdown("### 🔎 Data View")
 view_option = st.sidebar.radio(
     "Select data to display:",
     ["Calls", "Callers", "Both"],
-    index=1
+    index=0
 )
 
 # ==================================================

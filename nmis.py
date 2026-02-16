@@ -197,11 +197,32 @@ def calls_vs_callers(calls_df, caller_df):
     callers_m = callers_long.groupby("Month")["Value"].sum().reset_index()
     callers_m["Type"] = "Callers"
 
-    combined = pd.concat([calls_m, callers_m])
+    combined = pd.concat([calls_m, callers_m], ignore_index=True)
+
+    # Define the desired month order
+    month_order = ["September", "October", "November", "December", "January", "February"]
+
+    # If Month is not in full name, try to convert to full month name
+    def normalize_month(m):
+        try:
+            return pd.to_datetime(m, format="%B").strftime("%B")
+        except:
+            try:
+                return pd.to_datetime(m, format="%b").strftime("%B")
+            except:
+                return str(m)
+    combined["Month_norm"] = combined["Month"].apply(normalize_month)
+
+    # Filter only months in our order and set categorical type for correct plotting order
+    combined = combined[combined["Month_norm"].isin(month_order)]
+    combined["Month_norm"] = pd.Categorical(combined["Month_norm"], categories=month_order, ordered=True)
+    combined = combined.sort_values("Month_norm")
 
     st.subheader("📈 Calls vs Callers (Monthly Trend)")
 
-    fig = px.line(combined, x="Month", y="Value", color="Type", markers=True)
+    fig = px.line(combined, x="Month_norm", y="Value", color="Type", markers=True)
+    fig.update_xaxes(categoryorder="array", categoryarray=month_order)
+
     st.plotly_chart(fig, use_container_width=True)
 
 

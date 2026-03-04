@@ -347,7 +347,7 @@ def markets_dashboard(df):
     )
     st.plotly_chart(fig, use_container_width=True)
 
-    st.subheader("Markets Pivot Table")
+    st.subheader("Numbere of monthly market place by regions")
     all_regions = ["Oromia", "Afar", "Somali"]
     pivot_df = month_region_market_counts.pivot(
         index="Month", columns="Region", values="Market Places"
@@ -357,6 +357,14 @@ def markets_dashboard(df):
     pivot_df["MonthSort"] = pivot_df["Month"].map(month_sort_key)
     pivot_df = pivot_df.sort_values(["MonthSort", "Month"]).drop(columns=["MonthSort"])
     st.dataframe(pivot_df, use_container_width=True)
+
+    st.subheader("Total Collected by Market Place")
+    market_totals = (
+        filtered.groupby(["Market Location", "Region"], as_index=False)["Total Collected"]
+        .sum()
+        .sort_values("Total Collected", ascending=False)
+    )
+    st.dataframe(market_totals, use_container_width=True)
 
 
 # ==================================================
